@@ -42,14 +42,7 @@ class WP_Post_Meta_Revisioning {
 		// When revisioned post meta has changed, trigger a revision save.
 		add_filter( 'wp_save_post_revision_post_has_changed', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
-	}
-
-	/**
-	 * Add the revisioned meta to get_post_metadata for preview meta data.
-	 *
-	 * @since 4.5.0
-	 */
-	public function _add_metadata_preview_filter() {
+		// Add the revisioned meta to get_post_metadata for preview meta data.
 		add_filter( 'get_post_metadata', array( $this, '_wp_preview_meta_filter' ), 10, 4 );
 	}
 
@@ -198,6 +191,11 @@ class WP_Post_Meta_Revisioning {
 	 */
 	public function _wp_preview_meta_filter( $value, $object_id, $meta_key, $single ) {
 
+		// Only filter previews.
+		if ( ! is_preview() ) {
+			return $value;
+		}
+
 		$post = get_post();
 		if (
 			empty( $post ) ||
@@ -214,6 +212,7 @@ class WP_Post_Meta_Revisioning {
 			return $value;
 		}
 
+		// Return the autosave revisioned meta.
 		return get_post_meta( $preview->ID, $meta_key, $single );
 	}
 }
